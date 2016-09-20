@@ -84,6 +84,10 @@ public class NQueens{
                     collisions++;
             }
             
+            //removed this section of diagonal checker after I realized
+            //you only need to check the half of the array up to the position you are
+            //checking
+            
             /*
             for(int j = i+1; j < a.length; j++){
                 if(a[i] + (i- j) == a[j])
@@ -367,6 +371,10 @@ class QFinder{
                 if(a[i] - (i -j) == a[j])
                     collisions++;
             }
+            
+            //removed this section of diagonal checker after I realized
+            //you only need to check the half of the array up to the position you are
+            //checking
             /*
             for(int j = i+1; j < a.length; j++){
                 if(a[i] + (i- j) == a[j])
