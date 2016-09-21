@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 public class NQueens{
     
@@ -26,7 +27,11 @@ public class NQueens{
         QFinder qf = new QFinder(population, ps, pss, al);
         //System.out.println(qf.population);
         //run the qfinder
-        qf.run();
+        try{
+            qf.run();
+        } catch (Exception e){
+            System.exit(1);
+        }
 
     }
     
@@ -125,7 +130,7 @@ class QObject{
     
     @Override
     public String toString(){
-        return fitness + " " + Arrays.toString(genotype);
+        return Arrays.toString(genotype);
     }
     
 }
@@ -156,12 +161,64 @@ class QFinder{
             //System.out.print(population);
             //easy enough  to find a winning solution
             if(population.get(0).fitness() > 1){
+            
                 System.out.println("FOUND A MATCH");
                 System.out.println(population.get(0));
-                System.exit(0);
-            }   
+                
+                //need to print to a file by appending it
+                
+                
+                try{
+                    File writeTo = new File("results1.txt");
+                    
+                    //create the file if it does not exist
+                    if(!writeTo.exists()){
+                        writeTo.createNewFile();
+                    }
+                    
+                    //Here true is to append the content to file
+                    FileWriter fw = new FileWriter(writeTo,true);
+                    
+                    //BufferedWriter writer give better performance
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    bw.write(population.get(0) + ", " + count + "\n");
+                    
+                    //Closing BufferedWriter Stream
+                    bw.close();
+                    System.exit(0);
+                } catch (FileNotFoundException e){
+                    System.exit(1);
+                } catch (IOException e2){
+                    System.exit(1);
+                }
+                
+            }
+
             if(count > 1000){
                 System.out.println("NO MATCH FOUND");
+                try{
+                    File writeTo = new File("results1.txt");
+                    
+                    //create the file if it does not exist
+                    if(!writeTo.exists()){
+                        writeTo.createNewFile();
+                    }
+                    
+                    //Here true is to append the content to file
+                    FileWriter fw = new FileWriter(writeTo,true);
+                    
+                    //BufferedWriter writer give better performance
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    bw.write("Failed" + "; " + count + "\n");
+                    
+                    //Closing BufferedWriter Stream
+                    bw.close();
+                    System.exit(0);
+                } catch (FileNotFoundException e){
+                    System.exit(1);
+                } catch (IOException e2){
+                    System.exit(1);
+                }
                 System.exit(0);
             }
             //update the age of all subjects
