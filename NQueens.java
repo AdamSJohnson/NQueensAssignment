@@ -2,9 +2,14 @@ import java.util.*;
 import java.io.*;
 
 public class NQueens{
-    
-    
     public static void main(String[] args){
+    
+        //NOTES:
+        //  Some of the parameters are left overs from the first
+        //  iteration of NQueens. It used to be a fitness and age
+        //  based parent selection. Some of the variables are now 
+        //  statically coded as to allign with the assignment.
+        
         //accept in 3 parameters:
         // size, ps, pss
         // size is the N in n queens look it up
@@ -21,11 +26,14 @@ public class NQueens{
         //I left it in for ease of use, since generational limit is 1000
         //an age limit of 9000 should not disrupt the score
         int al = 9000;
+        
         //construct our population array list
         ArrayList<QObject> population = popBuilder(ps, size);
+        
         //setup the qfinder 
         QFinder qf = new QFinder(population, ps, pss, al);
         //System.out.println(qf.population);
+        
         //run the qfinder
         try{
             qf.run();
@@ -114,6 +122,7 @@ class QObject{
     double fitness;
     int[] genotype;
     int age;
+    
     public QObject(int[] a, double fitness){
         this.fitness = fitness;
         genotype = a;
@@ -287,13 +296,13 @@ class QFinder{
                 
                 //fitness fighting
                 //because the list is sorted already we can assume this
-                //a being > than b and c means a has a higher fitness
-                //b being > than a and c means b has a higher fitness
-                //c being > than b and c means c has the higher fitness
+                //a being < than b and c means a has a higher fitness
+                //b being < than a and c means b has a higher fitness
+                //c being < than b and c means c has the higher fitness
                 //in the event of a tie a wins over c and b wins over c
-                if( a >= b && b >= c)
+                if( a <= b && a <= c)
                     picks[i] = a;
-                else if( b >= c)
+                else if( b <= c)
                     picks[i] = b;
                 else
                     picks[i] = c;
@@ -313,11 +322,19 @@ class QFinder{
     
     
     //the combination function woooo
+    // Parameters: 
+    //      a and b are the two QObjects to merge together
     private void combine(QObject a, QObject b){
         //pick a combination point
         Random r = new Random();
-        int cp = r.nextInt(a.genotype().length - 2) + 1;
         
+        //find the cross point between 0 and the length of the genotype - 2
+        int cp = r.nextInt(a.genotype().length - 1) ;
+        
+        //if cp is the starting point subtract 1
+        if(cp == 0){
+            cp++;
+        }
         
         //create the new individuals
         int[] baby1 = new int[a.genotype().length];
@@ -349,6 +366,7 @@ class QFinder{
         }
 
         //System.out.println(Arrays.toString(baby1));
+        
         //random mutation
         mutate(baby1);
         mutate(baby2);
@@ -357,6 +375,11 @@ class QFinder{
         //System.out.println("Added new babies");
     }
     
+    
+    
+    //checks if an array contains the value 
+    //returns true if the value is in a
+    //return false if the value is not in a
     private boolean contains(int[] a, int value){
         for(int i = 0; i < a.length; i++){
             if(a[i] == value)
@@ -366,6 +389,9 @@ class QFinder{
         return false;
     }
     
+    //mutate takes an array and has a 10% chance of swapping two random positions in the array
+    //parameters:
+    //   a - the array to mutate
     public void mutate(int[] a){
         Random r = new Random();
         int b = r.nextInt(a.length);
@@ -375,9 +401,9 @@ class QFinder{
             a[b] = a[c];
             a[c] = temp;
         }
-        
     }
     
+    //sorts the array of QObjects
     private void fitnessSort(){
         QObject[] a = new QObject[this.population.size()];
         QObject insert = this.population.remove(population.size()-1);
@@ -404,10 +430,18 @@ class QFinder{
                 aSize++;
             }
         }
-       for(int i = 0; i < a.length; i++)
+        for(int i = 0; i < a.length; i++)
             this.population.add(a[i]);
         
     }
+    
+    //insert takes QObject b and inserts the object
+    //into the pos value of a
+    //parameters
+    //   a - the target array
+    //   b - what to insert
+    //   pos - where to insert it
+    //   aSize - the "end" of the array
     private void insert(QObject[] a, QObject b, int pos, int aSize){
         for(int i = aSize; i > pos ; i --){
             a[i]= a[i - 1];
@@ -415,6 +449,8 @@ class QFinder{
         a[pos ] = b;
     }
     
+    
+    //calulate the fitness of an array a
     public static double fitness(int[] a){
         int collisions = 0;
         double e = .00001;
